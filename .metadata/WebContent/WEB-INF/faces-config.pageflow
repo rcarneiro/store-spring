@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf12066720686560" configfile="/Store/WebContent/WEB-INF/faces-config.xml">
+  <nodes xsi:type="pageflow:PFPage" name="payment" x="122" y="178" id="pf12067713598900" referenceLink="//@navigationRule.0/@fromViewId|" outlinks="pf12067713598901 pf12068905769210 pf12068908709531 pf12068976657500" path="*"/>
+  <nodes xsi:type="pageflow:PFPage" name="index" x="338" y="178" id="pf12067713598902" referenceLink="//@navigationRule.0/@navigationCase.3/@toViewId|" inlinks="pf12067713598901 pf12068905769210" path="/index.jsp"/>
+  <nodes xsi:type="pageflow:PFPage" name="login" id="pf12068908709532" referenceLink="//@navigationRule.0/@navigationCase.1/@toViewId|" inlinks="pf12068908709531" path="/login.jsp"/>
+  <nodes xsi:type="pageflow:PFPage" name="orders" id="pf12068976657501" referenceLink="//@navigationRule.0/@navigationCase.2/@toViewId|" inlinks="pf12068976657500" path="/orders.jsp"/>
+  <links id="pf12067713598901" target="pf12067713598902" source="pf12067713598900" outcome="index"/>
+  <links id="pf12068905769210" target="pf12067713598902" source="pf12067713598900" outcome="logout" redirect="true"/>
+  <links id="pf12068908709531" target="pf12068908709532" source="pf12067713598900" outcome="login"/>
+  <links id="pf12068976657500" target="pf12068976657501" source="pf12067713598900" outcome="orders"/>
+</pageflow:Pageflow>

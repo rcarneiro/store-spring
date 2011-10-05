@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+    
+    <!-- Provisory, this configuration will be used only in development.
+         In production, the datasource will be configured in the container. -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/store" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+		<property name="maxActive" value="30" />
+		<property name="maxIdle" value="10" />
+		<property name="maxWait" value="1000" />
+		<property name="defaultAutoCommit" value="true" />
+	</bean>
+	
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:/store/model/dao/jpa/persistence.xml"/>
+		<property name="jpaVendorAdapter">
+			<bean
+				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="generateDdl" value="true" />				
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"/>		
+			</bean>
+		</property>
+	</bean>
+	
+	<tx:advice id="txAdvice" 
+	    transaction-manager="transactionManager">
+		<!-- configurações das transações -->
+		<tx:attributes>
+			<!-- todos os métodos que começam com 'select' e 'find' são read-only -->
+			<tx:method name="select*"
+			    propagation="SUPPORTS" 
+			    read-only="true" />
+		
+			<tx:method name="find*" 
+			   	propagation="SUPPORTS" read-only="true"/>
+		
+			<tx:method name="get*" 
+				propagation="SUPPORTS" read-only="true"/>
+			
+			<!-- Os outros métodos possuem requerem uma transação -->
+			<tx:method name="*" 
+				propagation="REQUIRED"  />
+			
+			<tx:method name="processPayment"
+				 propagation="REQUIRES_NEW"  />
+			
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+	    <!-- Todos as instâncias das classes que fazem parte do pacote 'service', independente da
+	    	hierarquia, terão os métodos gerenciados -->
+	    <aop:pointcut id="serviceMethods"
+			expression="execution(* *..service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice"
+			pointcut-ref="serviceMethods" />
+	</aop:config>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<!-- As propriedades são opcionais se informado o default-autowire="byName"-->
+	</bean>
+
+	<aop:config>
+		<aop:aspect id="orderHistoryAspect" ref="orderHistoryService">
+			<aop:pointcut id="historyPointCut"
+				expression="execution(* store.model.service.impl.OrderServiceImpl.checkout(..)) and args(order)" />
+			<aop:after pointcut-ref="historyPointCut"
+				method="saveHistoryFor" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- Services Beans-->
+
+	<bean id="productService"
+		class="store.model.service.impl.ProductServiceImpl">
+		<property name="productDAO" ref="productDAO" />	
+	</bean>
+
+	<bean id="orderService"
+		class="store.model.service.impl.OrderServiceImpl">
+		<property name="jmsPaymentTemplate" ref="jmsPaymentTemplate"/>
+	</bean>
+	
+	<bean id="customerService"
+		class="store.model.service.impl.CustomerServiceImpl">
+	</bean>
+	
+	<bean id="paymentProcessor"
+		class="store.model.service.impl.PaymentProcessorImpl">
+	</bean>
+	
+	<bean id="orderHistoryService"
+		class="store.model.service.impl.OrderHistoryServiceImpl">
+	</bean>
+	
+	<bean id="stockService"
+		class="store.model.service.impl.StockServiceImpl"/>
+
+	<!-- Data Access Object Beans -->
+
+	<bean id="productDAO"
+		class="store.model.dao.jpa.ProductJpaDAO">
+	</bean>
+	
+	<bean id="customerDAO"
+		class="store.model.dao.jpa.CustomerJpaDAO">
+	</bean>	
+	<bean id="paymentDAO"
+		class="store.model.dao.jpa.PaymentJpaDAO">
+	</bean>
+	
+	<bean id="orderHistoryDAO"
+		class="store.model.dao.jpa.OrderHistoryJpaDAO">
+	</bean>				
+
+	<bean id="orderDAO"
+		class="store.model.dao.jpa.OrderJpaDAO">
+	</bean>       
+</beans>
+

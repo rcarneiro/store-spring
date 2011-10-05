@@ -1,0 +1,36 @@
+Esse arquivo contém os passos para a correta configuração aplicação de exemplo em Spring
+
+Softwares necessários
+MySQL
+Tomcat 6.0.x
+JDK 1.6
+
+
+1. Descompacte o arquivo, se ainda não tiver feito.
+
+2. Você pode importar o projeto no Eclipse ou levar a pasta WebContent diretamente para a pasta webapps do Tomcat.
+    Se fizer este último passo, lembre-se de renomear a pasta de WebContent para Store, por exemplo.
+
+3. Crie um schema no MySQL Administrator ou por outra ferramenta. A aplicação usará um chamado "store", mas pode ser alterado
+   (ver proximo passo).
+
+4. No arquivo WEB-INF/applicationContext.xml tem a configuração da conexão com o servidor de banco de dados, 
+   no elemento chamado 'dataSource'. O usuário usado pela aplicação é 'root' e a senha 'root'. 
+   Se quiser alterar, faça isso em "username" e "password". 
+
+       <bean id="dataSource"
+	  ...
+	  <property name="url" value="jdbc:mysql://localhost:3306/store" />
+	  <property name="username" value="root" />
+	  <property name="password" value="root" />
+	  ...
+       </bean>
+
+5. Iniciar o servidor, pelo eclipse ou o Tomcat a parte. Os dados necessários serão criados na inicialização da aplicação.
+
+6. Acessar http://localhost:8080/Store/faces/index.jsp
+
+7. Quando for solicitado login e senha, digitar "customer" e "123", ambos sem aspas.
+
+PS.: O ActiveMQ precisa acessar a internet para a obtenção de um XSD.
+

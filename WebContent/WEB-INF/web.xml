@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>Store</display-name>
+	
+<filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+    <filter-mapping>
+      <filter-name>springSecurityFilterChain</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	
+	
+	<!-- TRINIDAD FILTER -->
+	<filter>
+		<filter-name>trinidad</filter-name>
+		<filter-class>
+			org.apache.myfaces.trinidad.webapp.TrinidadFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>trinidad</filter-name>
+		<servlet-name>Faces Servlet</servlet-name>
+	</filter-mapping>
+
+	<filter>
+		<description>
+			Necessário para o Lazy Loading funcionar quando as entidades
+			gerenciadas pelo EntityManager forem utilizadas em
+			ManagedBeans ou em JSPs.
+
+			Um bean com o id 'entityManagerFactory' precisa existir no
+			applicationContext.xml. Se precisar pode ser informado um
+			parâmetro no filtro para indicar qual o id do bean é o
+			EntityManagerFactory. (Ver documentação do Spring)
+		</description>
+		<filter-name>oemiv</filter-name>
+		<filter-class>
+			org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>oemiv</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<context-param>
+		<description>
+			Localizações, separadas por espaço, dos arquivos que contém
+			as configurações gerenciadas pelo Spring. O wildcard * pode
+			ser usado para definir uma expressão de arquivos com nomes
+			comuns. /WEB-INF/appContext*.xml
+		</description>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext*.xml</param-value>
+	</context-param>
+
+	<listener>
+		<description>
+			Listener responsável por iniciar o container do Spring
+		</description>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>/faces/*</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- Use client-side state saving.  In Trinidad, it is an
+		optimized, token-based mechanism that is almost always a
+		better choice than the standard JSF server-side state saving. -->
+	<context-param>
+		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+		<param-value>client</param-value>
+		<!--param-value>server</param-value-->
+	</context-param>
+
+	<context-param>
+		<param-name>
+			org.apache.myfaces.trinidad.DEBUG_JAVASCRIPT
+		</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+
+
+	<!-- Trinidad by default uses an optimized client-side state saving
+		mechanism. To disable that, uncomment the following -->
+	<context-param>
+		<param-name>
+			org.apache.myfaces.trinidad.CLIENT_STATE_METHOD
+		</param-name>
+		<param-value>all</param-value>
+	</context-param>
+
+	<!-- Trinidad also supports an optimized strategy for caching some
+		view state at an application level, which significantly improves
+		scalability.  However, it makes it harder to develop (updates to
+		pages will not be noticed until the server is restarted), and in
+		some rare cases cannot be used for some pages (see Trinidad
+		documentation for more information) -->
+	<context-param>
+		<param-name>
+			org.apache.myfaces.trinidad.USE_APPLICATION_VIEW_CACHE
+		</param-name>
+		<param-value>false</param-value>
+	</context-param>
+
+	<!-- If this parameter is enabled, Trinidad will automatically
+		check the modification date of your JSPs, and discard saved
+		state when they change;  this makes development easier,
+		but adds overhead that should be avoided when your application
+		is deployed -->
+	<context-param>
+		<param-name>
+			org.apache.myfaces.trinidad.CHECK_FILE_MODIFICATION
+		</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Enables Change Persistence at a session scope.  By default,
+		Change Persistence is entirely disabled. The ChangeManager is
+		an API, which can persist component modifications (like,
+		is a showDetail or tree expanded or collapsed). For providing
+		a custom Change Persistence implementation inherit from the 
+		Trinidad API's ChangeManager class. As the value you have 
+		to use the fullqualified class name. -->
+	<context-param>
+		<param-name>
+			org.apache.myfaces.trinidad.CHANGE_PERSISTENCE
+		</param-name>
+		<param-value>session</param-value>
+	</context-param>
+
+	<!-- resource loader servlet -->
+	<servlet>
+		<servlet-name>resources</servlet-name>
+		<servlet-class>
+			org.apache.myfaces.trinidad.webapp.ResourceServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>resources</servlet-name>
+		<url-pattern>/adf/*</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>/faces/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+	    <description>The servlet for webservices</description>
+		<servlet-name>CXFServlet</servlet-name>		
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/webservices/*</url-pattern>
+	</servlet-mapping>
+	
+	<listener>
+	  <listener-class>store.setup.SetupListener</listener-class>
+	</listener>
+	
+</web-app>

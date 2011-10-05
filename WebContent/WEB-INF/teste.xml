@@ -1,0 +1,24 @@
+ <jms:listener-container
+    connection-factory="jmsFactory"
+	concurrency="10">
+			
+	<jms:listener 
+	        destination="queue.Payments"
+			ref="paymentProcessor" 
+			method="processPayment" />
+			
+  </jms:listener-container>
+	
+  <bean id="jmsPaymentTemplate"
+	class="...jms.core.JmsTemplate">
+	
+	<constructor-arg>
+	  <ref bean="jmsFactory" />
+	</constructor-arg>
+	
+	<property name="defaultDestination"
+	   ref="queue.payment" />
+	   
+  </bean>
+
+  
